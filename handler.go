@@ -2,39 +2,38 @@ package main
 
 import (
 	"context"
-	"log"
 	pb "github.com/scribblink/smartie-consignment-service/proto/consignment"
-	vesselProto "github.com/scribblink/smartie-vessel-service/proto/vessel"
+	vehicleProto "github.com/scribblink/smartie-vehicle-service/proto/vehicle"
+	"log"
 )
 
 type handler struct {
-	repository
-	vesselClient vesselProto.VesselServiceClient
+	Repository
+	vehicleClient vehicleProto.VehicleServiceClient
 }
-
 
 // CreateConsignment - we created just one method on our service,
 // which is a create method, which takes a context and a request as an
 // argument, these are handled by the gRPC server.
 func (s *handler) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
 
-	// Here we call a client instance of our vessel service with our consignment weight,
+	// Here we call a client instance of our vehicle service with our consignment weight,
 	// and the amount of containers as the capacity value
-	vesselResponse, err := s.vesselClient.FindAvailable(ctx, &vesselProto.Specification{
+	vehicleResponse, err := s.vehicleClient.FindAvailable(ctx, &vehicleProto.Specification{
 		MaxWeight: req.Weight,
-		Capacity: int32(len(req.Containers)),
+		Capacity:  int32(len(req.Containers)),
 	})
-	log.Printf("Found vessel: %s \n", vesselResponse.Vessel.Name)
+	log.Printf("Found vehicle: %s \n", vehicleResponse.Vehicle.Name)
 	if err != nil {
 		return err
 	}
 
-	// We set the VesselId as the vessel we got back from our
-	// vessel service
-	req.VesselId = vesselResponse.Vessel.Id
+	// We set the VehicleId as the vehicle we got back from our
+	// vehicle service
+	req.VehicleId = vehicleResponse.Vehicle.Id
 
 	// Save our consignment
-	if err = s.repository.Create(req); err != nil {
+	if err = s.Repository.Create(req); err != nil {
 		return err
 	}
 
@@ -45,7 +44,7 @@ func (s *handler) CreateConsignment(ctx context.Context, req *pb.Consignment, re
 
 // GetConsignments -
 func (s *handler) GetConsignments(ctx context.Context, req *pb.GetRequest, res *pb.Response) error {
-	consignments, err := s.repository.GetAll()
+	consignments, err := s.Repository.GetAll()
 	if err != nil {
 		return err
 	}

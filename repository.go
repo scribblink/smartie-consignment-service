@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type repository interface {
+type Repository interface {
 	Create(consignment *pb.Consignment) error
 	GetAll() ([]*pb.Consignment, error)
 }

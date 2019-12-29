@@ -10,7 +10,7 @@ import (
 
 	"github.com/micro/go-micro"
 	pb "github.com/scribblink/smartie-consignment-service/proto/consignment"
-	vesselProto "github.com/scribblink/smartie-vessel-service/proto/vessel"
+	vehicleProto "github.com/scribblink/smartie-vehicle-service/proto/vehicle"
 )
 
 const (
@@ -38,8 +38,8 @@ func main() {
 	consignmentCollection := client.Database("smartie").Collection("consignments")
 
 	repository := &MongoRepository{consignmentCollection}
-	vesselClient := vesselProto.NewVesselServiceClient("smartie.client.service", srv.Client())
-	h := &handler{repository, vesselClient}
+	vehicleClient := vehicleProto.NewVehicleServiceClient("smartie.client.service", srv.Client())
+	h := &handler{repository, vehicleClient}
 
 	// Register handlers
 	pb.RegisterShippingServiceHandler(srv.Server(), h)
